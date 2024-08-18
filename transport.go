@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 
 	"github.com/nats-io/nats.go"
-	"github.com/oklog/ulid/v2"
 	"github.com/ollama/ollama/api"
 )
 
@@ -41,17 +40,13 @@ func ListHandler(svc Service) nats.MsgHandler {
 	}
 }
 
-func ChatHandler(svc Service, nc *nats.Conn) nats.MsgHandler {
+func ChatHandler(svc Service) nats.MsgHandler {
 	return func(msg *nats.Msg) {
 		var req *api.ChatRequest
 		if err := json.Unmarshal(msg.Data, &req); err != nil {
 			msg.Respond([]byte(err.Error()))
 			return
 		}
-
-		id := ulid.Make().String()
-
-		subject := "ollama.chats." + id
 
 		ctx := context.Background()
 		if err := svc.Chat(ctx, req, func(cr api.ChatResponse) error {
@@ -60,12 +55,10 @@ func ChatHandler(svc Service, nc *nats.Conn) nats.MsgHandler {
 				return err
 			}
 
-			return nc.Publish(subject, bs)
+			return msg.Respond(bs)
 		}); err != nil {
 			msg.Respond([]byte(err.Error()))
 			return
 		}
-
-		msg.Respond([]byte(subject))
 	}
 }

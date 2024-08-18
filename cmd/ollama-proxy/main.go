@@ -81,7 +81,7 @@ func run(cli *cli.Context) error {
 
 	nc.Subscribe("ollama.version", ollamaproxy.VersionHandler(svc))
 	nc.Subscribe("ollama.models", ollamaproxy.ListHandler(svc))
-	nc.Subscribe("ollama.chats", ollamaproxy.ChatHandler(svc, nc))
+	nc.Subscribe("ollama.chats", ollamaproxy.ChatHandler(svc))
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)

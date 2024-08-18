@@ -4,7 +4,6 @@ go 1.22.6
 
 require (
 	github.com/nats-io/nats.go v1.36.0
-	github.com/oklog/ulid/v2 v2.1.0
 	github.com/ollama/ollama v0.3.4
 	github.com/urfave/cli/v2 v2.27.3
 	go.uber.org/zap v1.27.0

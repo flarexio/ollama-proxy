@@ -11,7 +11,7 @@ import (
 	"github.com/urfave/cli/v2"
 	"go.uber.org/zap"
 
-	ollamaproxy "github.com/flarexio/ollama-proxy"
+	proxy "github.com/flarexio/ollama-proxy"
 )
 
 func main() {
@@ -52,12 +52,12 @@ func run(cli *cli.Context) error {
 
 	instance := cli.String("ollama-url")
 
-	svc, err := ollamaproxy.NewService(instance)
+	svc, err := proxy.NewService(instance)
 	if err != nil {
 		return err
 	}
 
-	svc = ollamaproxy.LoggingMiddleware(log)(svc)
+	svc = proxy.LoggingMiddleware(log)(svc)
 
 	ctx := context.Background()
 	ver, err := svc.Version(ctx)
@@ -73,15 +73,18 @@ func run(cli *cli.Context) error {
 	natsURL := cli.String("nats")
 	natsCreds := cli.String("creds")
 
-	nc, err := nats.Connect(natsURL, nats.UserCredentials(natsCreds))
+	nc, err := nats.Connect(natsURL,
+		nats.Name("ollama-proxy"),
+		nats.UserCredentials(natsCreds),
+	)
 	if err != nil {
 		return err
 	}
 	defer nc.Drain()
 
-	nc.Subscribe("ollama.version", ollamaproxy.VersionHandler(svc))
-	nc.Subscribe("ollama.models", ollamaproxy.ListHandler(svc))
-	nc.Subscribe("ollama.chats", ollamaproxy.ChatHandler(svc))
+	nc.Subscribe("ollama.version", proxy.VersionHandler(svc))
+	nc.Subscribe("ollama.models", proxy.ListHandler(svc))
+	nc.Subscribe("ollama.chat", proxy.ChatHandler(svc))
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)

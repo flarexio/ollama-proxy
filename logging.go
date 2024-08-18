@@ -1,4 +1,4 @@
-package ollamaproxy
+package proxy
 
 import (
 	"context"

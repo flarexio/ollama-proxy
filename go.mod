@@ -3,9 +3,9 @@ module github.com/flarexio/ollama-proxy
 go 1.22.6
 
 require (
-	github.com/nats-io/nats.go v1.36.0
-	github.com/ollama/ollama v0.3.4
-	github.com/urfave/cli/v2 v2.27.3
+	github.com/nats-io/nats.go v1.37.0
+	github.com/ollama/ollama v0.3.6
+	github.com/urfave/cli/v2 v2.27.4
 	go.uber.org/zap v1.27.0
 )
 
